@@ -224,8 +224,23 @@ def draw_grid(surface, grid):
                              (sx + j*block_size, sy + play_height))
 
 
-def clear_rows(grid, locked):
-    pass
+def clear_rows(grid : list, locked : dict):
+    '''
+    Clear the rows by scaning each filled space,
+    make them empty and insert a new row for each row of space removed
+    '''
+    for i in range(len(grid)):
+        filled = (0, 0, 0) not in grid[i]
+        if filled:
+            grid.pop(i) # remove the whole line
+            grid.insert(0, [(0,0,0) for _ in grid[0]])
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == (0, 0, 0):
+                locked.pop((j, i), None)
+            else:
+                locked[(j, i)] = grid[i][j]
+
 
 
 def draw_next_shape(shape, surface):
@@ -279,6 +294,7 @@ def main(win):
                 current_piece.y -= 1
                 change_piece = True
 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -318,9 +334,11 @@ def main(win):
                 locked_positions[p] = current_piece.color
             current_piece = next_piece
             next_piece = get_shape()
+            clear_rows(grid, locked_positions)
             change_piece = False
 
         draw_window(win, grid)
+
 
         if check_lost(locked_positions):
             run = False
