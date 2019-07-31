@@ -245,7 +245,7 @@ def draw_window(surface, grid):
             # surface is where it's drawn, grid[i][j] is the color, and the other parameter is position,
             # last is fill to fill in the box instead of a border
             pygame.draw.rect(surface, grid[i][j],
-                             (top_left_x + j * block_size, top_left_y + block_size, block_size, block_size), 0)
+                             (top_left_x + j * block_size, top_left_y + i*block_size, block_size, block_size), 0)
 
     pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
 
