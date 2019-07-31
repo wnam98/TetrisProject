@@ -244,7 +244,20 @@ def clear_rows(grid : list, locked : dict):
 
 
 def draw_next_shape(shape, surface):
-    pass
+    font = pygame.font.SysFont('comicsans', 30)
+    label = font.render('NEXT SHAPE:', 1, (255, 255, 255))
+
+    left_mid = top_left_x + play_width + 50
+    y_mid = top_left_y + play_height / 2 - 100
+    format = shape.shape[shape.rotation % len(shape.shape)] # returns the sublist that we need
+
+    for i, line in enumerate(format):
+        row = list(line)
+        for j, column in enumerate(row):
+            if column == '0':
+                pygame.draw.rect(surface, shape.color, (left_mid + j * 30, y_mid + i * block_size, block_size, block_size), 0)
+
+    surface.blit(label, (left_mid + 10, y_mid - 30))
 
 
 def draw_window(surface, grid):
@@ -338,6 +351,8 @@ def main(win):
             change_piece = False
 
         draw_window(win, grid)
+        draw_next_shape(next_piece, win)
+        pygame.display.update()
 
 
         if check_lost(locked_positions):
