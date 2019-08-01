@@ -1,6 +1,9 @@
 import pygame
 import random
+import winsound
 
+pygame.mixer.pre_init(44100, 16, 2, 4096)
+pygame.init()
 # creating the data structure for pieces
 # setting up global vars
 # functions
@@ -134,31 +137,28 @@ T = [['.....',
 
 shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
-
-
 # index 0 - 6 represent shape
-
 # piece class contains a constructor that takes in the parameters column, row, shape
-class Piece(object):
-    rows = 20
-    columns = 20
 
-    def __init__(self, column, row, shape):
-        self.x = column
-        self.y = row
+
+class Piece(object):
+    def __init__(self, x, y, shape):
+        self.x = x
+        self.y = y
         self.shape = shape
         self.color = shape_colors[shapes.index(shape)]
         self.rotation = 0
 
+
 # uses the grid data structure, each element in the list is
-# a tuple representing the color of the piece
+# a tuple representing the color black
 
 
 def create_grid(locked_positions={}):
     grid = [[(0, 0, 0) for x in range(10)] for x in range(20)]
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            if(j, i) in locked_positions:  # checks if position in grid is in locked
+            if (j, i) in locked_positions:  # checks if position in grid is in locked
                 # positions, (a piece that's already fallen) and modify the grid to show the pieces
                 c = locked_positions[(j, i)]
                 grid[i][j] = c
@@ -204,69 +204,107 @@ def check_lost(positions):  # checks if positions are above the screen
 
 
 def get_shape():
-    global shapes, shape_colors
-
     return Piece(5, 0, random.choice(shapes))
 
 
-def draw_text_middle(text : str, size : int, color : tuple, surface):
-    font = pygame.font.SysFont('comicsans', size)  # initialize the font
-    label = font.render(text, 1, color)  # initialize the label, antialiasing, white color label
+def draw_text_middle(surface, text, size, color):
+    font = pygame.font.SysFont('comicsans', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
-    # draws the label on the screen, puts it in the middle of the screen
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
 
 def draw_grid(surface, grid):
     sx = top_left_x
     sy = top_left_y
 
     for i in range(len(grid)):  # for every row draw a line, draws 20 verticals and 10 horizontals
-        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i*block_size), (sx + play_width, sy + i*block_size))
+        pygame.draw.line(surface, (0, 0, 0), (sx, sy + i * block_size), (sx + play_width, sy + i * block_size))
         for j in range(len(grid[i])):
-            pygame.draw.line(surface, (128, 128, 128), (sx + j*block_size, sy),
-                             (sx + j*block_size, sy + play_height))
+            pygame.draw.line(surface, (0, 0, 0), (sx + j * block_size, sy),
+                             (sx + j * block_size, sy + play_height))
 
 
-def clear_rows(grid : list, locked : dict):
-    '''
-    Clear the rows by scaning each filled space,
-    make them empty and insert a new row for each row of space removed
-    '''
-    for i in range(len(grid)):
-        filled = (0, 0, 0) not in grid[i]
-        if filled:
-            grid.pop(i) # remove the whole line
-            grid.insert(0, [(0,0,0) for _ in grid[0]])
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
-            if grid[i][j] == (0, 0, 0):
-                locked.pop((j, i), None)
-            else:
-                locked[(j, i)] = grid[i][j]
+def clear_rows(grid, locked):
+    inc = 0
+    for i in range(len(grid) - 1, -1, -1):
+        row = grid[i]
+        if (0, 0, 0) not in row:
+            inc += 1
+            ind = i
+            for j in range(len(row)):
+                try:
+                    del locked[(j, i)]
+                except:
+                    continue
 
+    if inc > 0:
+        for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
+            x, y = key
+            if y < ind:
+                newKey = (x, y + inc)
+                locked[newKey] = locked.pop(key)
+
+    return inc
 
 
 def draw_next_shape(shape, surface):
-    font = pygame.font.SysFont('comicsans', 30)
-    label = font.render('NEXT SHAPE:', 1, (255, 255, 255))
+    font = pygame.font.SysFont('comicsans', 20)
+    label = font.render('Next Shape:', 1, (255, 255, 255))
 
-    left_mid = top_left_x + play_width + 50
-    y_mid = top_left_y + play_height / 2 - 100
-    format = shape.shape[shape.rotation % len(shape.shape)] # returns the sublist that we need
+    sx = top_left_x + play_width + 50
+    sy = top_left_y + play_height / 2 - 100
+    format = shape.shape[shape.rotation % len(shape.shape)]
 
     for i, line in enumerate(format):
         row = list(line)
         for j, column in enumerate(row):
             if column == '0':
-                pygame.draw.rect(surface, shape.color, (left_mid + j * 30, y_mid + i * block_size, block_size, block_size), 0)
+                pygame.draw.rect(surface, shape.color, (sx + j * 30, sy + i * block_size, block_size, block_size), 0)
 
-    surface.blit(label, (left_mid + 10, y_mid - 30))
+    surface.blit(label, (sx + 10, sy - 30))
 
 
-def draw_window(surface, grid):
+def update_score(nscore):
+    score = max_score()
+
+    with open('scores.txt', 'w') as f:
+        if int(score) > nscore:
+            f.write(str(score))
+        else:
+            f.write(str(nscore))
+
+
+def max_score():
+    with open('scores.txt', 'r') as f:
+        lines = f.readlines()
+        score = lines[0].strip()
+
+    return score
+
+
+def draw_window(surface, grid, score=0, last_score=0):
     surface.fill((0, 0, 0))  # fill the surface with black
-    
-    draw_text_middle("TETRIS", 60, (255, 255, 255), surface)
+
+    pygame.font.init()
+    font = pygame.font.SysFont('Tetris Blocks', 24)  # initialize the font
+    label = font.render('T', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
+
+    # draws the label on the screen, puts it in the middle of the screen
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 60))
+    font = pygame.font.SysFont('comicsans', 30)
+    label = font.render('Score:' + str(score), 1, (255, 255, 255))
+
+    sx = top_left_x + play_width + 50
+    sy = top_left_y + play_height / 2 - 100
+
+    surface.blit(label, (sx + 20, sy + 160))
+
+    label = font.render('High Score:' + last_score, 1, (255, 255, 255))
+
+    sx = top_left_x - 200
+    sy = top_left_y + 200
+
+    surface.blit(label, (sx + 20, sy + 160))
 
     for i in range(len(grid)):  # loops through every color in the grid
         for j in range(len(grid[i])):
@@ -275,14 +313,19 @@ def draw_window(surface, grid):
             pygame.draw.rect(surface, grid[i][j],
                              (top_left_x + j * block_size, top_left_y + i*block_size, block_size, block_size), 0)
 
-    pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
+    pygame.draw.rect(surface, (255, 255, 255), (top_left_x, top_left_y, play_width, play_height), 5)
 
     draw_grid(surface, grid)
 
 
 def main(win):
+    last_score = max_score()
     locked_positions = {}
     grid = create_grid(locked_positions)
+
+    pygame.mixer.music.load("theme.wav")
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
 
     change_piece = False
     run = True  # for the while loop
@@ -290,47 +333,54 @@ def main(win):
     next_piece = get_shape()
     clock = pygame.time.Clock()
     fall_time = 0
-    fall_speed = 0.27
+    fall_speed = 0.50
+    level_time = 0
+    score = 0
 
     while run:
         grid = create_grid(locked_positions)
         fall_time += clock.get_rawtime()
+        level_time += clock.get_rawtime()
         clock.tick()
+
+        if level_time / 1000 > 5:
+            level_time = 0
+            if fall_speed > 0.12:
+                fall_speed -= 0.005
 
         if fall_time / 1000 > fall_speed:
             fall_time = 0
             current_piece.y += 1
-            if not(valid_space(current_piece, grid)) and current_piece.y > 0:
+            if not (valid_space(current_piece, grid)) and current_piece.y > 0:
                 current_piece.y -= 1
                 change_piece = True
-
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.display.quit()
-                quit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
+                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
                     current_piece.x -= 1
-                    if not valid_space(current_piece, grid):
+                    if not (valid_space(current_piece, grid)):
                         current_piece.x += 1
-
-                elif event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT:
+                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
                     current_piece.x += 1
-                    if not valid_space(current_piece, grid):
+                    if not (valid_space(current_piece, grid)):
                         current_piece.x -= 1
-                elif event.key == pygame.K_UP:
-                    current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
-                    if not valid_space(current_piece, grid):
-                        current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
-
                 if event.key == pygame.K_DOWN:
-                    current_piece.y += 1
-                    if not valid_space(current_piece, grid):
-                        current_piece.y -= 1
-
+                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
+                    current_piece.y += 2
+                    if not (valid_space(current_piece, grid)):
+                        current_piece.y -= 2
+                if event.key == pygame.K_UP:
+                    winsound.PlaySound("shift.wav", winsound.SND_ASYNC)
+                    current_piece.rotation += 1
+                    if not (valid_space(current_piece, grid)):
+                        current_piece.rotation -= 1
         shape_pos = convert_shape_format(current_piece)
 
         for i in range(len(shape_pos)):
@@ -344,21 +394,38 @@ def main(win):
                 locked_positions[p] = current_piece.color
             current_piece = next_piece
             next_piece = get_shape()
-            clear_rows(grid, locked_positions)
             change_piece = False
+            score += clear_rows(grid, locked_positions) * 10
+            winsound.PlaySound("lock.wav", winsound.SND_ASYNC)
 
-        draw_window(win, grid)
+        draw_window(win, grid, score, last_score)
         draw_next_shape(next_piece, win)
         pygame.display.update()
 
-
         if check_lost(locked_positions):
+            pygame.mixer.music.pause()
+            winsound.PlaySound("cleared.wav", winsound.SND_ASYNC)
+            draw_text_middle(win, "You Lost", 80, (255, 255, 255))
+            pygame.display.update()
+            pygame.time.delay(1500)
             run = False
-    pygame.display.quit()
+            update_score(score)
 
 
 def main_menu(win):
-    main(win)
+    run = True
+    while run:
+        win.fill((0, 0, 0))
+
+        draw_text_middle(win, 'Press any key to play', 20, (255, 255, 255))
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                main(win)
+
+    pygame.display.quit()
 
 
 win = pygame.display.set_mode((s_width, s_height))
