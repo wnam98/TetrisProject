@@ -358,6 +358,18 @@ def draw_window(surface, grid, score=0, last_score=0):
 
     draw_grid(surface, grid)
 
+def pause(pause_key):
+    pause = True
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event == pause_key:
+                pause = False
+                break
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.display.quit()
+                quit()
+
 
 def main(win):
     last_score = max_score()
@@ -377,8 +389,7 @@ def main(win):
     fall_speed = 0.50
     level_time = 0
     score = 0
-
-    while run:
+    while run:        
         grid = create_grid(locked_positions)
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
@@ -427,6 +438,9 @@ def main(win):
                     while valid_space(current_piece, grid):
                         current_piece.y += 1
                     current_piece.y -= 1
+                if event.key == pygame.K_p:
+                    pause(pygame.K_p)
+                    
         shape_pos = convert_shape_format(current_piece)
 
         for i in range(len(shape_pos)):
