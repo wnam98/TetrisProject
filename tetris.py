@@ -1,6 +1,7 @@
 import pygame
 import random
 import winsound
+from pygame.mixer import Sound
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -218,9 +219,9 @@ def draw_grid(surface, grid):
     sy = top_left_y
 
     for i in range(len(grid)):  # for every row draw a line, draws 20 verticals and 10 horizontals
-        pygame.draw.line(surface, (0, 0, 0), (sx, sy + i * block_size), (sx + play_width, sy + i * block_size))
+        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * block_size), (sx + play_width, sy + i * block_size))
         for j in range(len(grid[i])):
-            pygame.draw.line(surface, (0, 0, 0), (sx + j * block_size, sy),
+            pygame.draw.line(surface, (128, 128, 128), (sx + j * block_size, sy),
                              (sx + j * block_size, sy + play_height))
 
 
@@ -243,6 +244,8 @@ def clear_rows(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
+        
+        pygame.mixer.Channel(2).play(Sound("cleared.wav"))
 
     return inc
 
@@ -276,8 +279,7 @@ def update_score(nscore):
 
 def max_score():
     with open('scores.txt', 'r') as f:
-        lines = f.readlines()
-        score = lines[0].strip()
+        score = f.readline().strip()
 
     return score
 
@@ -359,25 +361,26 @@ def main(win):
             if event.type == pygame.QUIT:
                 run = False
                 pygame.display.quit()
+                quit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
+                    pygame.mixer.Channel(0).play(Sound("move.wav"))
                     current_piece.x -= 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.x += 1
                 if event.key == pygame.K_RIGHT:
-                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
+                    pygame.mixer.Channel(0).play(Sound("move.wav"))
                     current_piece.x += 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.x -= 1
                 if event.key == pygame.K_DOWN:
-                    winsound.PlaySound("move.wav", winsound.SND_ASYNC)
+                    pygame.mixer.Channel(0).play(Sound("move.wav"))
                     current_piece.y += 2
                     if not (valid_space(current_piece, grid)):
                         current_piece.y -= 2
                 if event.key == pygame.K_UP:
-                    winsound.PlaySound("shift.wav", winsound.SND_ASYNC)
+                    pygame.mixer.Channel(0).play(Sound("shift.wav"))
                     current_piece.rotation += 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
@@ -396,7 +399,7 @@ def main(win):
             next_piece = get_shape()
             change_piece = False
             score += clear_rows(grid, locked_positions) * 10
-            winsound.PlaySound("lock.wav", winsound.SND_ASYNC)
+            pygame.mixer.Channel(0).play(Sound("lock.wav"))
 
         draw_window(win, grid, score, last_score)
         draw_next_shape(next_piece, win)
@@ -425,7 +428,7 @@ def main_menu(win):
             if event.type == pygame.KEYDOWN:
                 main(win)
 
-    pygame.display.quit()
+    
 
 
 win = pygame.display.set_mode((s_width, s_height))
