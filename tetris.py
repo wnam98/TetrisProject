@@ -384,6 +384,10 @@ def main(win):
                     current_piece.rotation += 1
                     if not (valid_space(current_piece, grid)):
                         current_piece.rotation -= 1
+                if event.key == pygame.K_SPACE:
+                    while valid_space(current_piece, grid):
+                        current_piece.y += 1
+                    current_piece.y -= 1
         shape_pos = convert_shape_format(current_piece)
 
         for i in range(len(shape_pos)):
