@@ -278,7 +278,6 @@ def draw_window(surface, grid):
     pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
 
     draw_grid(surface, grid)
-    pygame.display.update()
 
 
 def main(win):
