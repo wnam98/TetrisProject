@@ -209,9 +209,12 @@ def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
 
-def draw_text_middle(text, size, color, surface):
-    pass
+def draw_text_middle(text : str, size : int, color : tuple, surface):
+    font = pygame.font.SysFont('comicsans', size)  # initialize the font
+    label = font.render(text, 1, color)  # initialize the label, antialiasing, white color label
 
+    # draws the label on the screen, puts it in the middle of the screen
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
 
 def draw_grid(surface, grid):
     sx = top_left_x
@@ -262,11 +265,8 @@ def draw_next_shape(shape, surface):
 
 def draw_window(surface, grid):
     surface.fill((0, 0, 0))  # fill the surface with black
-    font = pygame.font.SysFont('comicsans', 60)  # initialize the font
-    label = font.render('TETRIS', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
-
-    # draws the label on the screen, puts it in the middle of the screen
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
+    
+    draw_text_middle("TETRIS", 60, (255, 255, 255), surface)
 
     for i in range(len(grid)):  # loops through every color in the grid
         for j in range(len(grid[i])):
