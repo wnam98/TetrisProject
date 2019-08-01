@@ -138,6 +138,8 @@ T = [['.....',
 
 shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
+
+
 # index 0 - 6 represent shape
 # piece class contains a constructor that takes in the parameters column, row, shape
 
@@ -208,10 +210,46 @@ def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
 
+def display_title(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
+
+
 def draw_text_middle(surface, text, size, color):
-    font = pygame.font.SysFont('comicsans', size, bold=True)
+    font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
+
+
+def draw_left_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 70))
+
+
+def draw_right_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 100))
+
+
+def draw_up_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 130))
+
+
+def draw_down_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 160))
+
+
+def draw_space_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 190))
 
 
 def draw_grid(surface, grid):
@@ -219,9 +257,9 @@ def draw_grid(surface, grid):
     sy = top_left_y
 
     for i in range(len(grid)):  # for every row draw a line, draws 20 verticals and 10 horizontals
-        pygame.draw.line(surface, (128, 128, 128), (sx, sy + i * block_size), (sx + play_width, sy + i * block_size))
+        pygame.draw.line(surface, (0, 0, 0), (sx, sy + i * block_size), (sx + play_width, sy + i * block_size))
         for j in range(len(grid[i])):
-            pygame.draw.line(surface, (128, 128, 128), (sx + j * block_size, sy),
+            pygame.draw.line(surface, (0, 0, 0), (sx + j * block_size, sy),
                              (sx + j * block_size, sy + play_height))
 
 
@@ -244,14 +282,14 @@ def clear_rows(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
-        
+
         pygame.mixer.Channel(2).play(Sound("cleared.wav"))
 
     return inc
 
 
 def draw_next_shape(shape, surface):
-    font = pygame.font.SysFont('comicsans', 20)
+    font = pygame.font.SysFont('Tetris', 20)
     label = font.render('Next Shape:', 1, (255, 255, 255))
 
     sx = top_left_x + play_width + 50
@@ -289,20 +327,20 @@ def draw_window(surface, grid, score=0, last_score=0):
     surface.fill((0, 0, 0))  # fill the surface with black
 
     pygame.font.init()
-    font = pygame.font.SysFont('Tetris Blocks', 24)  # initialize the font
-    label = font.render('T', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
+    font = pygame.font.SysFont('Tetris', 30)  # initialize the font
+    label = font.render('TETRIS', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
 
     # draws the label on the screen, puts it in the middle of the screen
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 60))
-    font = pygame.font.SysFont('comicsans', 30)
-    label = font.render('Score:' + str(score), 1, (255, 255, 255))
+    font = pygame.font.SysFont('Tetris', 20)
+    label = font.render('Score: ' + str(score), 1, (255, 255, 255))
 
     sx = top_left_x + play_width + 50
     sy = top_left_y + play_height / 2 - 100
 
     surface.blit(label, (sx + 20, sy + 160))
 
-    label = font.render('High Score:' + last_score, 1, (255, 255, 255))
+    label = font.render('High Score: ' + last_score, 1, (255, 255, 255))
 
     sx = top_left_x - 200
     sy = top_left_y + 200
@@ -314,7 +352,7 @@ def draw_window(surface, grid, score=0, last_score=0):
             # surface is where it's drawn, grid[i][j] is the color, and the other parameter is position,
             # last is fill to fill in the box instead of a border
             pygame.draw.rect(surface, grid[i][j],
-                             (top_left_x + j * block_size, top_left_y + i*block_size, block_size, block_size), 0)
+                             (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
 
     pygame.draw.rect(surface, (255, 255, 255), (top_left_x, top_left_y, play_width, play_height), 5)
 
@@ -412,8 +450,8 @@ def main(win):
 
         if check_lost(locked_positions):
             pygame.mixer.music.pause()
-            pygame.mixer.Channel(0).play(Sound("cleared.wav"))
-            draw_text_middle(win, "You Lost", 80, (255, 255, 255))
+            pygame.mixer.Channel(0).play(Sound("game_over.wav"))
+            draw_text_middle(win, "GAME OVER", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
@@ -425,15 +463,22 @@ def main_menu(win):
     while run:
         win.fill((0, 0, 0))
 
-        draw_text_middle(win, 'Press any key to play', 20, (255, 255, 255))
+        display_title(win, 'TETRIS', 100, (255, 255, 255))
+        draw_text_middle(win, 'Press any key to play', 30, (255, 255, 255))
+        draw_right_controls(win, 'Press right to move block right', 20, (255, 255, 255))
+        draw_left_controls(win, 'Press left to move block left', 20, (255, 255, 255))
+        draw_up_controls(win, 'Press up to shift shape configuration', 20, (255, 255, 255))
+        draw_down_controls(win, 'Press down to increase block speed', 20, (255, 255, 255))
+        draw_space_controls(win, 'Press space to slam a block down', 20, (255, 255, 255))
+
+
+
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
                 main(win)
-
-    
 
 
 win = pygame.display.set_mode((s_width, s_height))
