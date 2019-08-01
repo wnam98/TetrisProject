@@ -280,6 +280,7 @@ def update_score(nscore):
 def max_score():
     with open('scores.txt', 'r') as f:
         score = f.readline().strip()
+        score = score if score != '' else '0'
 
     return score
 
@@ -411,7 +412,7 @@ def main(win):
 
         if check_lost(locked_positions):
             pygame.mixer.music.pause()
-            winsound.PlaySound("cleared.wav", winsound.SND_ASYNC)
+            pygame.mixer.Channel(0).play(Sound("cleared.wav"))
             draw_text_middle(win, "You Lost", 80, (255, 255, 255))
             pygame.display.update()
             pygame.time.delay(1500)
