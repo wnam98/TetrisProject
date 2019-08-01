@@ -362,11 +362,11 @@ def pause(pause_key):
     pause = True
     while pause:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event == pause_key:
+            if event.type == pygame.KEYDOWN and event.key == pause_key:
                 pause = False
-                break
+                return
             if event.type == pygame.QUIT:
-                run = False
+                pause = False
                 pygame.display.quit()
                 quit()
 
