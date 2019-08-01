@@ -2,6 +2,8 @@ import pygame
 import random
 import winsound
 from pygame.mixer import Sound
+from pygame.locals import *
+
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -23,8 +25,8 @@ represented in order by 0 - 6
 pygame.font.init()
 
 # GLOBALS VARS
-s_width = 800
-s_height = 700
+s_width = 750
+s_height = 650
 play_width = 300  # meaning 300 // 10 = 30 width per block
 play_height = 600  # meaning 600 // 20 = 20 height per block
 block_size = 30
@@ -277,24 +279,23 @@ def draw_grid(surface, grid):
 
 
 def clear_rows(grid, locked):
+    '''
+    Clear the rows by scaning each filled space,
+    make them empty and insert a new row for each row of space removed
+    '''
     inc = 0
-    for i in range(len(grid) - 1, -1, -1):
-        row = grid[i]
-        if (0, 0, 0) not in row:
+    for i in range(len(grid)):
+        filled = (0, 0, 0) not in grid[i]
+        if filled:
+            grid.pop(i) # remove the whole line
+            grid.insert(0, [(0,0,0) for _ in grid[0]])
             inc += 1
-            ind = i
-            for j in range(len(row)):
-                try:
-                    del locked[(j, i)]
-                except:
-                    continue
-
-    if inc > 0:
-        for key in sorted(list(locked), key=lambda x: x[1])[::-1]:
-            x, y = key
-            if y < ind:
-                newKey = (x, y + inc)
-                locked[newKey] = locked.pop(key)
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == (0, 0, 0):
+                locked.pop((j, i), None)
+            else:
+                locked[(j, i)] = grid[i][j]
 
         pygame.mixer.Channel(2).play(Sound("cleared.wav"))
 
@@ -387,6 +388,7 @@ def pause(pause_key):
                 pause = False
                 pygame.display.quit()
                 quit()
+
 
 
 def main(win):
