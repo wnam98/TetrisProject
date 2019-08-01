@@ -281,8 +281,6 @@ def draw_window(surface, grid):
 
 
 def main(win):
-    global grid
-
     locked_positions = {}
     grid = create_grid(locked_positions)
 
