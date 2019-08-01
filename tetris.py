@@ -213,43 +213,56 @@ def get_shape():
 def display_title(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
 
 
 def draw_text_middle(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
 
 def draw_left_controls(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 70))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 70))
 
 
 def draw_right_controls(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 100))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 100))
 
 
 def draw_up_controls(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 130))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 130))
 
 
 def draw_down_controls(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 160))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 160))
 
 
 def draw_space_controls(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 190))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 190))
+
+
+def draw_pause_controls(surface, text, size, color):
+    font = pygame.font.SysFont('Tetris', size, bold=True)
+    label = font.render(text, 1, color)
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 220))
 
 
 def draw_grid(surface, grid):
@@ -358,11 +371,16 @@ def draw_window(surface, grid, score=0, last_score=0):
 
     draw_grid(surface, grid)
 
+
 def pause(pause_key):
+    pygame.mixer.music.pause()
+    draw_text_middle(win, 'PAUSED', 25, (255, 255, 255))
+    pygame.display.update()
     pause = True
     while pause:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pause_key:
+                pygame.mixer.music.unpause()
                 pause = False
                 return
             if event.type == pygame.QUIT:
@@ -389,7 +407,7 @@ def main(win):
     fall_speed = 0.50
     level_time = 0
     score = 0
-    while run:        
+    while run:
         grid = create_grid(locked_positions)
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
@@ -440,7 +458,7 @@ def main(win):
                     current_piece.y -= 1
                 if event.key == pygame.K_p:
                     pause(pygame.K_p)
-                    
+
         shape_pos = convert_shape_format(current_piece)
 
         for i in range(len(shape_pos)):
@@ -484,8 +502,7 @@ def main_menu(win):
         draw_up_controls(win, 'Press up to shift shape configuration', 20, (255, 255, 255))
         draw_down_controls(win, 'Press down to increase block speed', 20, (255, 255, 255))
         draw_space_controls(win, 'Press space to slam a block down', 20, (255, 255, 255))
-
-
+        draw_pause_controls(win, 'Press p to pause', 20, (255, 255, 255))
 
         pygame.display.update()
         for event in pygame.event.get():
