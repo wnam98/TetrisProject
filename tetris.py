@@ -1,6 +1,5 @@
 import pygame
 import random
-import winsound
 from pygame.mixer import Sound
 from pygame.locals import *
 
@@ -25,8 +24,8 @@ represented in order by 0 - 6
 pygame.font.init()
 
 # GLOBALS VARS
-s_width = 750
-s_height = 650
+s_width = 800
+s_height = 700
 play_width = 300  # meaning 300 // 10 = 30 width per block
 play_height = 600  # meaning 600 // 20 = 20 height per block
 block_size = 30
@@ -215,8 +214,7 @@ def get_shape():
 def display_title(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (
-    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
 
 
 def draw_text_middle(surface, text, size, color):
@@ -289,6 +287,7 @@ def clear_rows(grid, locked):
         if filled:
             grid.pop(i) # remove the whole line
             grid.insert(0, [(0,0,0) for _ in grid[0]])
+            pygame.mixer.Channel(2).play(Sound("cleared.wav"))
             inc += 1
     for i in range(len(grid)):
         for j in range(len(grid[i])):
@@ -296,9 +295,6 @@ def clear_rows(grid, locked):
                 locked.pop((j, i), None)
             else:
                 locked[(j, i)] = grid[i][j]
-
-        pygame.mixer.Channel(2).play(Sound("cleared.wav"))
-
     return inc
 
 
@@ -345,7 +341,7 @@ def draw_window(surface, grid, score=0, last_score=0):
     label = font.render('TETRIS', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
 
     # draws the label on the screen, puts it in the middle of the screen
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 60))
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
     font = pygame.font.SysFont('Tetris', 20)
     label = font.render('Score: ' + str(score), 1, (255, 255, 255))
 
@@ -390,13 +386,12 @@ def pause(pause_key):
                 quit()
 
 
-
 def main(win):
     last_score = max_score()
     locked_positions = {}
     grid = create_grid(locked_positions)
 
-    pygame.mixer.music.load("theme.wav")
+    pygame.mixer.music.load("theme.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
@@ -497,7 +492,7 @@ def main_menu(win):
     while run:
         win.fill((0, 0, 0))
 
-        display_title(win, 'TETRIS', 100, (255, 255, 255))
+        display_title(win, 'PYTHON TETRIS', 70, (255, 255, 255))
         draw_text_middle(win, 'Press any key to play', 30, (255, 255, 255))
         draw_right_controls(win, 'Press right to move block right', 20, (255, 255, 255))
         draw_left_controls(win, 'Press left to move block left', 20, (255, 255, 255))
