@@ -2,7 +2,7 @@ import pygame
 import random
 from pygame.mixer import Sound
 from pygame.locals import *
-
+import time
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
@@ -210,11 +210,11 @@ def check_lost(positions):  # checks if positions are above the screen
 def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
-
 def display_title(surface, text, size, color):
     font = pygame.font.SysFont('Tetris', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
+    surface.blit(label, (
+    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
 
 
 def draw_text_middle(surface, text, size, color):
@@ -335,7 +335,6 @@ def max_score():
 
 def draw_window(surface, grid, score=0, last_score=0):
     surface.fill((0, 0, 0))  # fill the surface with black
-
     pygame.font.init()
     font = pygame.font.SysFont('Tetris', 30)  # initialize the font
     label = font.render('TETRIS', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
@@ -351,7 +350,6 @@ def draw_window(surface, grid, score=0, last_score=0):
     surface.blit(label, (sx + 20, sy + 160))
 
     label = font.render('High Score: ' + last_score, 1, (255, 255, 255))
-
     sx = top_left_x - 200
     sy = top_left_y + 200
 
@@ -365,7 +363,6 @@ def draw_window(surface, grid, score=0, last_score=0):
                              (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
 
     pygame.draw.rect(surface, (255, 255, 255), (top_left_x, top_left_y, play_width, play_height), 5)
-
     draw_grid(surface, grid)
 
 
@@ -485,14 +482,29 @@ def main(win):
             pygame.time.delay(1500)
             run = False
             update_score(score)
-
+            pygame.mixer.music.load("beat.wav")
+            pygame.mixer.music.play(-1)
 
 def main_menu(win):
+    clock = pygame.time.Clock()
+    pygame.mixer.music.load("beat.wav")
+    pygame.mixer.music.play(-1)
+    count = 0
     run = True
     while run:
         win.fill((0, 0, 0))
-
-        display_title(win, 'PYTHON TETRIS', 70, (255, 255, 255))
+        count += 1
+        if count % 2 == 0:
+            sel_color = shape_colors[0]
+        elif count % 3 == 0:
+            sel_color = shape_colors[1]
+        elif count % 4 == 0:
+            sel_color = shape_colors[2]
+        elif count % 5 == 0:
+            sel_color = shape_colors[3]
+        else:
+            sel_color = shape_colors[6]
+        display_title(win, "PYTHON TETRIS", 70, sel_color)
         draw_text_middle(win, 'Press any key to play', 30, (255, 255, 255))
         draw_right_controls(win, 'Press right to move block right', 20, (255, 255, 255))
         draw_left_controls(win, 'Press left to move block left', 20, (255, 255, 255))
@@ -500,12 +512,13 @@ def main_menu(win):
         draw_down_controls(win, 'Press down to increase block speed', 20, (255, 255, 255))
         draw_space_controls(win, 'Press space to slam a block down', 20, (255, 255, 255))
         draw_pause_controls(win, 'Press p to pause', 20, (255, 255, 255))
-
         pygame.display.update()
+        clock.tick(5)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
+                pygame.mixer.music.stop()
                 main(win)
 
 
