@@ -141,6 +141,8 @@ shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
 
 
+MAX_SCORE = 0 #Creating maximum score
+
 # index 0 - 6 represent shape
 # piece class contains a constructor that takes in the parameters column, row, shape
 
@@ -317,20 +319,15 @@ def draw_next_shape(shape, surface):
 
 def update_score(nscore):
     score = max_score()
-    high_score_menu(win)
-    with open('scores.txt', 'w') as f:
-        if int(score) > nscore:
-            f.write(str(score))
-        else:
-            f.write(str(nscore))
+    # print("Max {}, Curr {}".format(score, nscore))
+    if score < nscore:
+        global MAX_SCORE
+        MAX_SCORE = nscore
+        high_score_menu(win)
 
 
 def max_score():
-    with open('scores.txt', 'r') as f:
-        score = f.readline().strip()
-        score = score if score != '' else '0'
-
-    return score
+    return MAX_SCORE
 
 
 def draw_window(surface, grid, score=0, last_score=0):
@@ -349,7 +346,7 @@ def draw_window(surface, grid, score=0, last_score=0):
 
     surface.blit(label, (sx + 20, sy + 160))
 
-    label = font.render('High Score: ' + last_score, 1, (255, 255, 255))
+    label = font.render('High Score: ' + str(last_score), 1, (255, 255, 255))
     sx = top_left_x - 200
     sy = top_left_y + 200
 
@@ -545,7 +542,7 @@ def main_menu(win):
         clock.tick(5)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                quit() #Force quitting the game
             if event.type == pygame.KEYDOWN:
                 pygame.mixer.music.stop()
                 main(win)
