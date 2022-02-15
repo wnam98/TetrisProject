@@ -6,6 +6,7 @@ import time
 
 pygame.mixer.pre_init(44100, 16, 2, 4096)
 pygame.init()
+pygame.font.init()
 # creating the data structure for pieces
 # setting up global vars
 # functions
@@ -21,7 +22,7 @@ shapes: S, Z, I, O, J, L, T
 represented in order by 0 - 6
 """
 
-pygame.font.init()
+
 
 # GLOBALS VARS
 s_width = 800
@@ -213,56 +214,56 @@ def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
 def display_title(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
 
 
 def draw_text_middle(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
 
 def draw_left_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 70))
 
 
 def draw_right_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 100))
 
 
 def draw_up_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 130))
 
 
 def draw_down_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 160))
 
 
 def draw_space_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 190))
 
 
 def draw_pause_controls(surface, text, size, color):
-    font = pygame.font.SysFont('Tetris', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size, bold=True)
     label = font.render(text, 1, color)
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 220))
 
@@ -301,7 +302,7 @@ def clear_rows(grid, locked):
 
 
 def draw_next_shape(shape, surface):
-    font = pygame.font.SysFont('Tetris', 20)
+    font = pygame.font.Font('Tetris.ttf', 20)
     label = font.render('Next Shape:', 1, (255, 255, 255))
 
     sx = top_left_x + play_width + 50
@@ -325,20 +326,19 @@ def update_score(nscore):
         MAX_SCORE = nscore
         high_score_menu(win)
 
-
 def max_score():
     return MAX_SCORE
-
 
 def draw_window(surface, grid, score=0, last_score=0):
     surface.fill((0, 0, 0))  # fill the surface with black
     pygame.font.init()
-    font = pygame.font.SysFont('Tetris', 30)  # initialize the font
+    font = pygame.font.Font('Tetris.ttf', 30)  # initialize the font
     label = font.render('TETRIS', 1, (255, 255, 255))  # initialize the label, antialiasing, white color label
+
 
     # draws the label on the screen, puts it in the middle of the screen
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), 30))
-    font = pygame.font.SysFont('Tetris', 20)
+    font = pygame.font.Font('Tetris.ttf', 20)
     label = font.render('Score: ' + str(score), 1, (255, 255, 255))
 
     sx = top_left_x + play_width + 50
