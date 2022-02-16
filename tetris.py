@@ -385,7 +385,7 @@ def main(win):
     locked_positions = {}
     grid = create_grid(locked_positions)
 
-    pygame.mixer.music.load("theme.mp3")
+    pygame.mixer.music.load("themebass.mp3")
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play(-1)
 
