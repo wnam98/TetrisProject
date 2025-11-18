@@ -333,7 +333,9 @@ def update_score(nscore):
         global MAX_SCORE
         MAX_SCORE = nscore
         save_max_score(nscore)
-        high_score_menu(win)
+        #high_score_menu(win)
+        return True
+    return False
 
 def max_score():
     return MAX_SCORE
@@ -487,9 +489,11 @@ def main(win):
             pygame.display.update()
             pygame.time.delay(1500)
             run = False
-            update_score(score)
-            pygame.mixer.music.load("beat.wav")
-            pygame.mixer.music.play(-1)
+            if update_score(score):
+                high_score_menu(win)
+            else:
+                pygame.mixer.music.load("beat.wav")
+                pygame.mixer.music.play(-1)
 
 
 def high_score_menu(win):
