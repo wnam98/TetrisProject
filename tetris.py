@@ -2,9 +2,8 @@ import pygame
 import random
 from pygame.mixer import Sound
 from pygame.locals import *
-import time
 
-pygame.mixer.pre_init(44100, 16, 2, 4096)
+pygame.mixer.init()
 pygame.init()
 pygame.font.init()
 # creating the data structure for pieces
@@ -21,8 +20,6 @@ pygame.font.init()
 shapes: S, Z, I, O, J, L, T
 represented in order by 0 - 6
 """
-
-
 
 # GLOBALS VARS
 s_width = 800
@@ -141,8 +138,19 @@ T = [['.....',
 shapes = [S, Z, I, O, J, L, T]
 shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 165, 0), (0, 0, 255), (128, 0, 128)]
 
+def load_max_score():
+    try:
+        with open("highscore.txt", "r") as f:
+            score = int(f.read())
+            return score
+    except:
+        return 0
 
-MAX_SCORE = 0 #Creating maximum score
+MAX_SCORE = load_max_score()  # global max score variable
+    
+def save_max_score(score):   
+    with open("highscore.txt", "w") as f:
+        f.write(str(score))
 
 # index 0 - 6 represent shape
 # piece class contains a constructor that takes in the parameters column, row, shape
@@ -214,56 +222,56 @@ def get_shape():
     return Piece(5, 0, random.choice(shapes))
 
 def display_title(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() - 100))
 
 
 def draw_text_middle(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
 
 def draw_left_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 70))
 
 
 def draw_right_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 100))
 
 
 def draw_up_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 130))
 
 
 def draw_down_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 160))
 
 
 def draw_space_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (
     top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 190))
 
 
 def draw_pause_controls(surface, text, size, color):
-    font = pygame.font.Font('Tetris.ttf', size, bold=True)
+    font = pygame.font.Font('Tetris.ttf', size)
     label = font.render(text, 1, color)
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() + 220))
 
@@ -324,6 +332,7 @@ def update_score(nscore):
     if score < nscore:
         global MAX_SCORE
         MAX_SCORE = nscore
+        save_max_score(nscore)
         high_score_menu(win)
 
 def max_score():
