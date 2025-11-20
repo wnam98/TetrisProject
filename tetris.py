@@ -4,7 +4,6 @@ from pygame.mixer import Sound
 from pygame.locals import *
 import os
 
-
 pygame.mixer.init()
 pygame.init()
 pygame.font.init()
@@ -145,6 +144,7 @@ music_enabled = True
 sfx_enabled = True
 show_music_off_text = False
 show_sound_fx_off_text = False
+menu_music = True
 
 def load_music_index():
     try:
@@ -176,14 +176,16 @@ def play_music():
     pygame.mixer.music.play(-1)
 
 def toggle_music():
-    global music_enabled, show_music_off_text
+    global music_enabled, show_music_off_text, menu_music
     music_enabled = not music_enabled
     if music_enabled:
         show_music_off_text = False
         play_music()
+        menu_music = True
     else:
         pygame.mixer.music.pause()
         show_music_off_text = True
+        menu_music = False
 
 def next_music_track():
     global current_music_index
@@ -488,7 +490,6 @@ def main(win):
 
     play_music()
     pygame.mixer.music.set_volume(0.5)
-    pygame.mixer.music.play(-1)
 
     change_piece = False
     run = True  # for the while loop
@@ -662,8 +663,10 @@ def high_score_menu(win):
 
 def main_menu(win):
     clock = pygame.time.Clock()
-    pygame.mixer.music.load("beat.wav")
-    pygame.mixer.music.play(-1)
+    if menu_music:
+        pygame.mixer.music.load("beat.wav")
+        pygame.mixer.music.play(-1)
+    
     count = 0
     run = True
     while run:
