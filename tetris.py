@@ -588,15 +588,29 @@ def main(win):
             draw_text_upper_right(win, 'SOUND FX OFF', 25, (255, 0, 0), padding = 50, adjust = 30)
 
         pygame.display.update()
-
+        
         if check_lost(locked_positions):
             pygame.mixer.music.pause()
-            #pygame.mixer.Channel(0).play(Sound("game_over.wav"))
             play_sfx("game_over.wav", channel=2)
             draw_text_middle(win, "GAME OVER", 80, (255, 255, 255))
             pygame.display.update()
-            pygame.time.delay(1500)
+
+            # Show GAME OVER text for 1.5 seconds
+            pygame.time.delay(150)
+
+            # ---- Ignore all key inputs for 5 seconds ----
+            ignore_end_time = pygame.time.get_ticks() + 500
+            while pygame.time.get_ticks() < ignore_end_time:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        return  # or sys.exit()
+        # Optional: still allow drawing/updating screen
+                pygame.display.update()
+
+    # ---- After ignoring keys, continue ----
             run = False
+
             if update_score(score):
                 high_score_menu(win)
             else:
@@ -605,11 +619,17 @@ def main(win):
 def high_score_menu(win):
     run = True
     count = 0
+
+    # --- Ignore key inputs for the first 2 seconds ---
+    ignore_until = pygame.time.get_ticks() + 2000  
+
     pygame.mixer.music.load("highscore.wav")
     pygame.mixer.music.play(0)
+
     while run:
         win.fill((0, 0, 0))
         count += 1
+
         if count % 2 == 0:
             sel_color = shape_colors[0]
         elif count % 3 == 0:
@@ -620,17 +640,25 @@ def high_score_menu(win):
             sel_color = shape_colors[3]
         else:
             sel_color = shape_colors[6]
+
         display_title(win, "NEW HIGHSCORE", 70, sel_color)
         score = max_score()
         draw_text_middle(win, f'{score}', 70, (255, 255, 255))
         pygame.display.update()
-        
+
+        # --- Event loop ---
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
             if event.type == pygame.KEYDOWN:
+                # Ignore key presses during the first 2 seconds
+                if pygame.time.get_ticks() < ignore_until:
+                    continue
+
                 pygame.mixer.music.stop()
                 main_menu(win)
+
 
 def main_menu(win):
     clock = pygame.time.Clock()
